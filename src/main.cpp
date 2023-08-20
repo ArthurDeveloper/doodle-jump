@@ -1,4 +1,6 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Rect.hpp>
+#include <SFML/Window/WindowStyle.hpp>
 #include <iostream>
 
 #define G 0.2
@@ -45,15 +47,14 @@ public:
 };
 
 int main() {
-	sf::RenderWindow window(sf::VideoMode(640, 480), "Doodle jump");
+	sf::RenderWindow window(sf::VideoMode(640.f, 480.f), "Doodle jump", sf::Style::Resize);
 	window.setFramerateLimit(60);
 
-	sf::View view;
-	view.setViewport(sf::FloatRect(0.0f, 0.0f, 1.f, 1.f));
+	sf::View view(sf::FloatRect(0.0f, 0.0f, 640.f, 480.f));
 	window.setView(view);
 
 #ifdef SFML_SYSTEM_LINUX
-	// Helping my fellow i3 users
+	// Helping my fellow i3 users ;)
 	system("i3-msg '[class=\"Doodle jump\"] floating enable' &>/dev/null");
 #endif
 
@@ -65,6 +66,8 @@ int main() {
 			if (e.type == sf::Event::Closed) {
 				window.close();
 				return 0;
+			} else if (e.type == sf::Event::Resized) {
+				view.setSize(e.size.width, e.size.height);
 			} else if (e.type == sf::Event::KeyPressed) {
 				if (e.key.code == sf::Keyboard::Key::Up && !doodle.jumping) {
 					doodle.jump();
@@ -96,6 +99,7 @@ int main() {
 			doodle.move(8.f*doodle.direction);
 		}
 
+		window.setView(view);
 		window.clear(sf::Color().White);
 		doodle.draw(window);
 		window.display();
