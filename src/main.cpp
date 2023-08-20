@@ -1,16 +1,14 @@
 #include <SFML/Graphics.hpp>
-#include <SFML/Graphics/Rect.hpp>
-#include <SFML/Window/WindowStyle.hpp>
 #include <iostream>
 
-#define G 0.2
+const float G = 9.8;
 
 class Doodle {
 private:
 	sf::Texture t;
 	sf::Sprite s; 
 	float x, y = 0;
-	float y_acceleration = 0;
+	float y_speed = 0;
 	int max_y_speed = 9;
 
 public:
@@ -23,9 +21,9 @@ public:
 		s.setTexture(t);
 	}
 
-	inline void update() {
-		if (y_acceleration < max_y_speed) y_acceleration += G;
-		y -= y_acceleration;
+	inline void update(float dt) {
+		if (y_speed < max_y_speed) y_speed += G * dt;
+		y -= y_speed;
 		s.setOrigin(x, y);
 	}
 
@@ -39,7 +37,7 @@ public:
 
 	inline void jump() {
 		jumping = true;
-		y_acceleration = -12;
+		y_speed = -12;
 	}
 };
 
@@ -57,6 +55,7 @@ int main() {
 
 	Doodle doodle;
 
+	sf::Clock clock;
 	while (true) {
 		sf::Event e;
 		while (window.pollEvent(e)) {
@@ -90,7 +89,9 @@ int main() {
 			}
 		}
 
-		doodle.update();
+		float dt = clock.restart().asSeconds();
+
+		doodle.update(dt);
 
 		if (doodle.moving) {
 			doodle.move(8.f*doodle.direction);
