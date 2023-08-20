@@ -21,9 +21,6 @@ public:
 	Doodle() {
 		t.loadFromFile("res/doodle.png");
 		s.setTexture(t);
-		s.setScale(2.f, 2.f);
-		//rect.setSize(sf::Vector2f(32.f, 32.f));
-		//rect.setFillColor(sf::Color().Black);
 	}
 
 	inline void update() {
