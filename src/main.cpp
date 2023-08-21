@@ -154,8 +154,13 @@ int main() {
 			platforms.push_back(platform);
 		}
 
+		int min_offset = 100;
+		int max_offset = 250;
 		for (int i = 0; i < 10; i++) {
-			Platform platform(rand() % 400, platforms[platforms.size() - 1].position().y - (rand() % 201));
+			Platform platform(
+				rand() % 400,
+				platforms[platforms.size() - 1].position().y - (min_offset + (rand() % (max_offset + 1)))
+			);
 			platforms.push_back(platform);
 		}
 	};
