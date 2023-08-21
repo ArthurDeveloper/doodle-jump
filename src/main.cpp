@@ -30,6 +30,7 @@ public:
 	Doodle() {
 		t.loadFromFile("res/doodle.png");
 		s.setTexture(t);
+		s.setScale(-1, 1);
 		x = 400.f / 2; y = 533.f / 2;
 	}
 
