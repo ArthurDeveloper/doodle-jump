@@ -4,6 +4,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/WindowStyle.hpp>
+#include <cstdlib>
 #include <iostream>
 
 const int G = 600;
@@ -97,7 +98,6 @@ public:
 	inline void handle_collision(Doodle& doodle) {
 		if (s.getGlobalBounds().intersects(doodle.bounds())) {
 			if (y > doodle.position().y + doodle.bounds().height / 2) {
-				std::cout << "since i lost you it feels like years" << std::endl; 
 				doodle.jump();
 			}
 		}
@@ -109,6 +109,8 @@ public:
 };
 
 int main() {
+	srand(time(NULL));
+
 	sf::RenderWindow window(sf::VideoMode(400.f, 533.f), "Doodle jump", sf::Style::Titlebar);
 	window.setFramerateLimit(60);
 
@@ -117,7 +119,11 @@ int main() {
 
 	Doodle doodle;
 
-	Platform platform(200, 300);
+	std::vector<Platform> platforms;
+	for (int i = 0; i < 10; i++) {
+		Platform platform(rand() % 401, rand() % 534);
+		platforms.push_back(platform);
+	}
 
 	sf::Texture background_t;
 	background_t.loadFromFile("res/background.png");
@@ -148,14 +154,18 @@ int main() {
 		doodle.update(dt);
 		doodle.clamp(0, view.getSize().x);
 
-		platform.handle_collision(doodle);
+		for (Platform platform : platforms) {
+			platform.handle_collision(doodle);
+		}
 
 		window.setView(view);
 		
 		window.clear(sf::Color().White);
 		
 		window.draw(background_s);
-		platform.draw(window);
+		for (Platform platform : platforms) {
+			platform.draw(window);
+		}
 		doodle.draw(window);
 
 		window.display();
