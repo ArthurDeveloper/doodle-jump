@@ -8,7 +8,7 @@
 #include <cstdlib>
 #include <iostream>
 
-const int G = 600;
+const int G = 900;
 
 const int RIGHT = 1;
 const int LEFT = -1;
@@ -21,7 +21,7 @@ private:
 	float x, y = 0;
 	float x_speed = 300;
 	float y_speed = 0;
-	float jump_force = 700;
+	float jump_force = 900;
 	int max_y_speed = 500;
 
 public:
