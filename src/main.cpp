@@ -20,7 +20,6 @@ private:
 	int max_y_speed = 500;
 
 public:
-	bool moving = false;
 	int direction = NONE;
 
 	Doodle() {
@@ -49,6 +48,16 @@ public:
 
 	inline void stop() {
 		direction = NONE;
+	}
+
+	inline void clamp(int x1, int x2) {
+		if (x + s.getGlobalBounds().width < x1) {
+			x = x2;
+		}
+
+		if (x > x2) {
+			x = x1 - s.getGlobalBounds().width;
+		}
 	}
 
 	inline void jump() {
@@ -92,6 +101,7 @@ int main() {
 		float dt = clock.restart().asSeconds();
 
 		doodle.update(dt);
+		doodle.clamp(0, view.getSize().x);
 
 		window.setView(view);
 		
