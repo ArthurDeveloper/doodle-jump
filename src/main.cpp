@@ -145,6 +145,7 @@ int main() {
 	window.setView(view);
 
 	Doodle doodle;
+	doodle.jump();
 
 	std::vector<Platform> platforms;
 	auto generate_platforms = [&]() {
