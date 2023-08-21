@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Keyboard.hpp>
+#include <SFML/Window/WindowStyle.hpp>
 #include <iostream>
 
 const int G = 600;
@@ -56,14 +57,20 @@ public:
 };
 
 int main() {
-	sf::RenderWindow window(sf::VideoMode(640.f, 480.f), "Doodle jump", sf::Style::Resize);
+	sf::RenderWindow window(sf::VideoMode(400.f, 533.f), "Doodle jump", sf::Style::Titlebar);
 	window.setFramerateLimit(60);
 
-	sf::View view(sf::FloatRect(0.0f, 0.0f, 640.f, 480.f));
+	sf::View view(sf::FloatRect(0.0f, 0.0f, 400.f, 533.f));
 	window.setView(view);
 
 	Doodle doodle;
 
+	sf::Texture background_t;
+	background_t.loadFromFile("res/background.png");
+
+	sf::Sprite background_s;
+	background_s.setTexture(background_t);
+	
 	sf::Clock clock;
 	while (true) {
 		sf::Event e;
@@ -71,8 +78,6 @@ int main() {
 			if (e.type == sf::Event::Closed) {
 				window.close();
 				return 0;
-			} else if (e.type == sf::Event::Resized) {
-				view.setSize(e.size.width, e.size.height);
 			} else if (e.type == sf::Event::KeyPressed) {
 				if (e.key.code == sf::Keyboard::Key::Up) {
 					doodle.jump();
@@ -88,13 +93,10 @@ int main() {
 
 		doodle.update(dt);
 
-/*		if (doodle.moving) {
-			doodle.move(8.f*doodle.direction);
-		}*/
-
 		window.setView(view);
 		window.clear(sf::Color().White);
 		doodle.draw(window);
+		window.draw(background_s);
 		window.display();
 	}
 
