@@ -2,7 +2,7 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <iostream>
 
-const int G = 100;
+const int G = 600;
 
 const int RIGHT = 1;
 const int LEFT = -1;
@@ -15,17 +15,17 @@ private:
 	float x, y = 0;
 	float x_speed = 300;
 	float y_speed = 0;
-	float jump_force = 500;
+	float jump_force = 700;
 	int max_y_speed = 500;
 
 public:
-	bool jumping = false;
 	bool moving = false;
 	int direction = NONE;
 
 	Doodle() {
 		t.loadFromFile("res/doodle.png");
 		s.setTexture(t);
+		x = 640.f / 2; y = 480.f / 2;
 	}
 
 	inline void update(float dt) {
@@ -51,7 +51,6 @@ public:
 	}
 
 	inline void jump() {
-		jumping = true;
 		y_speed = -jump_force;
 	}
 };
@@ -75,12 +74,8 @@ int main() {
 			} else if (e.type == sf::Event::Resized) {
 				view.setSize(e.size.width, e.size.height);
 			} else if (e.type == sf::Event::KeyPressed) {
-				if (e.key.code == sf::Keyboard::Key::Up && !doodle.jumping) {
-					doodle.jump();
-				}
-			} else if (e.type == sf::Event::KeyReleased) {
 				if (e.key.code == sf::Keyboard::Key::Up) {
-					doodle.jumping = false;
+					doodle.jump();
 				}
 			}
 		}
