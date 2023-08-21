@@ -1,4 +1,7 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/Texture.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/WindowStyle.hpp>
 #include <iostream>
@@ -26,6 +29,14 @@ public:
 		t.loadFromFile("res/doodle.png");
 		s.setTexture(t);
 		x = 400.f / 2; y = 533.f / 2;
+	}
+
+	inline sf::Vector2f position() {
+		return {x, y};
+	}
+
+	inline sf::FloatRect bounds() {
+		return s.getGlobalBounds();
 	}
 
 	inline void update(float dt) {
@@ -65,6 +76,38 @@ public:
 	}
 };
 
+class Platform {
+private:
+	int x, y;
+	
+	sf::Texture t;
+	sf::Sprite s;
+
+public:
+	inline Platform(int x, int y) {
+		this->x = x;
+		this->y = y;
+
+		s.setPosition(x, y);
+
+		t.loadFromFile("res/platform.png");
+		s.setTexture(t);
+	}
+
+	inline void handle_collision(Doodle& doodle) {
+		if (s.getGlobalBounds().intersects(doodle.bounds())) {
+			if (y > doodle.position().y + doodle.bounds().height / 2) {
+				std::cout << "since i lost you it feels like years" << std::endl; 
+				doodle.jump();
+			}
+		}
+	}
+
+	inline void draw(sf::RenderWindow& window) {
+		window.draw(s);
+	}
+};
+
 int main() {
 	sf::RenderWindow window(sf::VideoMode(400.f, 533.f), "Doodle jump", sf::Style::Titlebar);
 	window.setFramerateLimit(60);
@@ -73,6 +116,8 @@ int main() {
 	window.setView(view);
 
 	Doodle doodle;
+
+	Platform platform(200, 300);
 
 	sf::Texture background_t;
 	background_t.loadFromFile("res/background.png");
@@ -103,10 +148,14 @@ int main() {
 		doodle.update(dt);
 		doodle.clamp(0, view.getSize().x);
 
+		platform.handle_collision(doodle);
+
 		window.setView(view);
 		
 		window.clear(sf::Color().White);
+		
 		window.draw(background_s);
+		platform.draw(window);
 		doodle.draw(window);
 
 		window.display();
