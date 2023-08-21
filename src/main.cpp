@@ -26,7 +26,7 @@ public:
 	Doodle() {
 		t.loadFromFile("res/doodle.png");
 		s.setTexture(t);
-		x = 640.f / 2; y = 480.f / 2;
+		x = 400.f / 2; y = 533.f / 2;
 	}
 
 	inline void update(float dt) {
@@ -94,9 +94,11 @@ int main() {
 		doodle.update(dt);
 
 		window.setView(view);
+		
 		window.clear(sf::Color().White);
-		doodle.draw(window);
 		window.draw(background_s);
+		doodle.draw(window);
+
 		window.display();
 	}
 
