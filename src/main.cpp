@@ -1,14 +1,19 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Window/Keyboard.hpp>
 #include <iostream>
 
 const int G = 100;
+
+const int RIGHT = 1;
+const int LEFT = -1;
+const int NONE = 0;
 
 class Doodle {
 private:
 	sf::Texture t;
 	sf::Sprite s; 
 	float x, y = 0;
-	float x_speed = 150;
+	float x_speed = 300;
 	float y_speed = 0;
 	float jump_force = 500;
 	int max_y_speed = 500;
@@ -16,7 +21,7 @@ private:
 public:
 	bool jumping = false;
 	bool moving = false;
-	int direction = 1;
+	int direction = NONE;
 
 	Doodle() {
 		t.loadFromFile("res/doodle.png");
@@ -28,7 +33,7 @@ public:
 		if (y_speed > max_y_speed) {
 			y_speed = max_y_speed;
 		}
-		x += x_speed * dt;
+		x += x_speed * direction * dt;
 		y += y_speed * dt;
 		s.setPosition(x, y);
 	}
@@ -37,8 +42,12 @@ public:
 		window.draw(s);
 	}
 
-	inline void move(float distance) {
-		x += distance;
+	inline void move(int direction) {
+		this->direction = direction;
+	}
+
+	inline void stop() {
+		direction = NONE;
 	}
 
 	inline void jump() {
@@ -69,26 +78,16 @@ int main() {
 				if (e.key.code == sf::Keyboard::Key::Up && !doodle.jumping) {
 					doodle.jump();
 				}
-
-				if (e.key.code == sf::Keyboard::Key::Right) {
-					doodle.moving = true;
-					doodle.direction = 1;
-				} 
-
-				if (e.key.code == sf::Keyboard::Key::Left) {
-					doodle.moving = true;
-					doodle.direction = -1;
-				}
 			} else if (e.type == sf::Event::KeyReleased) {
 				if (e.key.code == sf::Keyboard::Key::Up) {
 					doodle.jumping = false;
 				}
-				if (e.key.code == sf::Keyboard::Key::Right && doodle.direction == -1
-					|| e.key.code == sf::Keyboard::Key::Left && doodle.direction == 1) {
-					doodle.moving = false;
-				}
 			}
 		}
+
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) doodle.move(RIGHT);
+		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) doodle.move(LEFT);
+		else doodle.move(NONE);
 
 		float dt = clock.restart().asSeconds();
 
