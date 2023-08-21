@@ -199,8 +199,9 @@ int main() {
 			}
 
 			if (e.type == sf::Event::KeyPressed) {
-				if (e.key.scancode == sf::Keyboard::Scancode::R) {
+				if (e.key.scancode == sf::Keyboard::Scancode::R && game_over) {
 					reset_game();
+					doodle.jump();
 				}
 			}
 		}
