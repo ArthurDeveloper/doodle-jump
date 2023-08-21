@@ -23,8 +23,8 @@ public:
 
 	inline void update(float dt) {
 		if (y_speed < max_y_speed) y_speed += G * dt;
-		y -= y_speed;
-		s.setOrigin(x, y);
+		y += y_speed;
+		s.setPosition(x, y);
 	}
 
 	inline void draw(sf::RenderWindow& window) {
@@ -71,12 +71,12 @@ int main() {
 
 				if (e.key.code == sf::Keyboard::Key::Right) {
 					doodle.moving = true;
-					doodle.direction = -1;
+					doodle.direction = 1;
 				} 
 
 				if (e.key.code == sf::Keyboard::Key::Left) {
 					doodle.moving = true;
-					doodle.direction = 1;
+					doodle.direction = -1;
 				}
 			} else if (e.type == sf::Event::KeyReleased) {
 				if (e.key.code == sf::Keyboard::Key::Up) {
