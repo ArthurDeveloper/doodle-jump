@@ -138,10 +138,6 @@ int main() {
 			if (e.type == sf::Event::Closed) {
 				window.close();
 				return 0;
-			} else if (e.type == sf::Event::KeyPressed) {
-				if (e.key.code == sf::Keyboard::Key::Up) {
-					doodle.jump();
-				}
 			}
 		}
 
@@ -158,11 +154,18 @@ int main() {
 			platform.handle_collision(doodle);
 		}
 
-		window.setView(view);
+		if (doodle.position().y < view.getCenter().y) {
+			view.setCenter(view.getCenter().x, doodle.position().y);
+		}
+
+		
 		
 		window.clear(sf::Color().White);
 		
+		window.setView(window.getDefaultView());
 		window.draw(background_s);
+		
+		window.setView(view);
 		for (Platform platform : platforms) {
 			platform.draw(window);
 		}
