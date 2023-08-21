@@ -185,8 +185,12 @@ int main() {
 		doodle.update(dt);
 		doodle.clamp(0, view.getSize().x);
 
-		for (int i = 0; i < platforms.size(); i++) {
-			platforms[i].handle_collision(doodle);
+		for (Platform platform : platforms) {
+			platform.handle_collision(doodle);
+		}
+
+		if (platforms[0].position().y > view.getCenter().y + view.getSize().y) {
+			platforms.erase(platforms.begin());
 		}
 
 		// TODO: Get the outermost platform instead of the one of the last index
