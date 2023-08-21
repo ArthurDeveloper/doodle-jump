@@ -1,6 +1,8 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/Text.hpp>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Keyboard.hpp>
@@ -31,6 +33,12 @@ public:
 		t.loadFromFile("res/doodle.png");
 		s.setTexture(t);
 		x = 400.f / 2; y = 533.f / 2;
+	}
+
+	inline void reset() {
+		x = 400.f / 2; y = 533.f / 2;
+		y_speed = 0;
+		s.setPosition(x, y);
 	}
 
 	inline bool is_falling() {
@@ -138,6 +146,8 @@ sf::Texture Platform::t;
 int main() {
 	srand(time(NULL));
 
+	bool game_over = false;
+
 	sf::RenderWindow window(sf::VideoMode(400.f, 533.f), "Doodle jump", sf::Style::Titlebar);
 	window.setFramerateLimit(60);
 
@@ -171,7 +181,14 @@ int main() {
 
 	sf::Sprite background_s;
 	background_s.setTexture(background_t);
-	
+
+	auto reset_game = [&]() {
+		doodle.reset();
+		platforms.clear();
+		view.setCenter((float)window.getSize().x / 2, (float)window.getSize().y / 2);
+		game_over = false;
+	};
+
 	sf::Clock clock;
 	while (true) {
 		sf::Event e;
@@ -180,13 +197,19 @@ int main() {
 				window.close();
 				return 0;
 			}
+
+			if (e.type == sf::Event::KeyPressed) {
+				if (e.key.scancode == sf::Keyboard::Scancode::R) {
+					reset_game();
+				}
+			}
 		}
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) doodle.move(RIGHT);
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) doodle.move(LEFT);
 		else doodle.move(NONE);
 
-		float dt = clock.restart().asSeconds();
+		float dt = game_over ? 0 : clock.restart().asSeconds();
 
 		doodle.update(dt);
 		doodle.clamp(0, view.getSize().x);
@@ -199,13 +222,17 @@ int main() {
 			platforms.erase(platforms.begin());
 		}
 
-		// TODO: Get the outermost platform instead of the one of the last index
 		if (platforms[platforms.size() - 1].is_in_view(view)) {
 			generate_platforms();
 		}
 
 		if (doodle.position().y < view.getCenter().y) {
 			view.setCenter(view.getCenter().x, doodle.position().y);
+		}
+
+		int tolerance = 50;
+		if (doodle.position().y > view.getCenter().y + view.getSize().y / 2 + tolerance) {
+			game_over = true;
 		}
 		
 		window.clear(sf::Color().White);
@@ -218,6 +245,40 @@ int main() {
 			platform.draw(window);
 		}
 		doodle.draw(window);
+
+		if (game_over) {
+			window.setView(window.getDefaultView());
+			
+			sf::RectangleShape overlay((sf::Vector2f)window.getSize());
+			overlay.setFillColor(sf::Color(0, 0, 0, 120));
+
+			sf::Font font;
+			font.loadFromFile("res/game_over.ttf");
+
+			sf::Text game_over_text;
+			game_over_text.setString("GAME OVER");
+			game_over_text.setFillColor(sf::Color::Red);
+			game_over_text.setFont(font);
+			game_over_text.setCharacterSize(128);
+			game_over_text.setPosition(
+				(float)window.getSize().x / 2 - game_over_text.getGlobalBounds().width / 2,
+				(float)window.getSize().y / 2 - game_over_text.getGlobalBounds().height / 2 - 200
+			);
+
+			sf::Text restart_game_text;
+			restart_game_text.setString("Press R to restart");
+			restart_game_text.setFillColor(sf::Color::Red);
+			restart_game_text.setFont(font);
+			restart_game_text.setCharacterSize(32);
+			restart_game_text.setPosition(
+				(float)window.getSize().x / 2 - restart_game_text.getGlobalBounds().width / 2,
+				(float)window.getSize().y / 2 - restart_game_text.getGlobalBounds().height / 2
+			);
+
+			window.draw(overlay);
+			window.draw(game_over_text);
+			window.draw(restart_game_text);
+		}
 
 		window.display();
 	}
