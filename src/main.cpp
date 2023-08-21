@@ -1,15 +1,17 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
-const float G = 9.8;
+const int G = 100;
 
 class Doodle {
 private:
 	sf::Texture t;
 	sf::Sprite s; 
 	float x, y = 0;
+	float x_speed = 150;
 	float y_speed = 0;
-	int max_y_speed = 9;
+	float jump_force = 500;
+	int max_y_speed = 500;
 
 public:
 	bool jumping = false;
@@ -22,8 +24,12 @@ public:
 	}
 
 	inline void update(float dt) {
-		if (y_speed < max_y_speed) y_speed += G * dt;
-		y += y_speed;
+		y_speed += G * dt;
+		if (y_speed > max_y_speed) {
+			y_speed = max_y_speed;
+		}
+		x += x_speed * dt;
+		y += y_speed * dt;
 		s.setPosition(x, y);
 	}
 
@@ -37,7 +43,7 @@ public:
 
 	inline void jump() {
 		jumping = true;
-		y_speed = -12;
+		y_speed = -jump_force;
 	}
 };
 
@@ -47,11 +53,6 @@ int main() {
 
 	sf::View view(sf::FloatRect(0.0f, 0.0f, 640.f, 480.f));
 	window.setView(view);
-
-#ifdef SFML_SYSTEM_LINUX
-	// Helping my fellow i3 users ;)
-	system("i3-msg '[class=\"Doodle jump\"] floating enable' &>/dev/null");
-#endif
 
 	Doodle doodle;
 
@@ -93,9 +94,9 @@ int main() {
 
 		doodle.update(dt);
 
-		if (doodle.moving) {
+/*		if (doodle.moving) {
 			doodle.move(8.f*doodle.direction);
-		}
+		}*/
 
 		window.setView(view);
 		window.clear(sf::Color().White);
