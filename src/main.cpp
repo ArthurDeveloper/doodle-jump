@@ -2,6 +2,7 @@
 #include <SFML/Graphics/Rect.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Window/WindowStyle.hpp>
 #include <cstdlib>
@@ -79,34 +80,56 @@ public:
 
 class Platform {
 private:
-	int x, y;
+	float x, y;
 	
-	sf::Texture t;
+	static sf::Texture t;
+	static bool textureHasBeenLoaded;
 	sf::Sprite s;
 
 public:
-	inline Platform(int x, int y) {
+	inline Platform(float x, float y) {
 		this->x = x;
 		this->y = y;
 
 		s.setPosition(x, y);
 
-		t.loadFromFile("res/platform.png");
+		if (!Platform::textureHasBeenLoaded) {
+			Platform::t.loadFromFile("res/platform.png");
+			textureHasBeenLoaded = true;
+		}
 		s.setTexture(t);
 	}
 
-	inline void handle_collision(Doodle& doodle) {
+	inline sf::Vector2f position() {
+		return {x, y};
+	}
+
+	inline bool handle_collision(Doodle& doodle) {
 		if (s.getGlobalBounds().intersects(doodle.bounds())) {
 			if (y > doodle.position().y + doodle.bounds().height / 2) {
 				doodle.jump();
+				return true;
 			}
 		}
+
+		return false;
+	}
+
+	inline bool is_in_view(sf::View view) {
+		if (std::abs(s.getPosition().y - view.getCenter().y) <= view.getSize().y / 2) {
+			return true;
+		}
+
+		return false;
 	}
 
 	inline void draw(sf::RenderWindow& window) {
 		window.draw(s);
 	}
 };
+
+bool Platform::textureHasBeenLoaded = false;
+sf::Texture Platform::t;
 
 int main() {
 	srand(time(NULL));
@@ -120,10 +143,18 @@ int main() {
 	Doodle doodle;
 
 	std::vector<Platform> platforms;
-	for (int i = 0; i < 10; i++) {
-		Platform platform(rand() % 401, rand() % 534);
-		platforms.push_back(platform);
-	}
+	auto generate_platforms = [&]() {
+		if (platforms.size() == 0) {
+			Platform platform(rand() % 400, window.getSize().y - 100);
+			platforms.push_back(platform);
+		}
+
+		for (int i = 0; i < 10; i++) {
+			Platform platform(rand() % 400, platforms[platforms.size() - 1].position().y - (rand() % 201));
+			platforms.push_back(platform);
+		}
+	};
+	generate_platforms();
 
 	sf::Texture background_t;
 	background_t.loadFromFile("res/background.png");
@@ -150,15 +181,18 @@ int main() {
 		doodle.update(dt);
 		doodle.clamp(0, view.getSize().x);
 
-		for (Platform platform : platforms) {
-			platform.handle_collision(doodle);
+		for (int i = 0; i < platforms.size(); i++) {
+			platforms[i].handle_collision(doodle);
+		}
+
+		// TODO: Get the outermost platform instead of the one of the last index
+		if (platforms[platforms.size() - 1].is_in_view(view)) {
+			generate_platforms();
 		}
 
 		if (doodle.position().y < view.getCenter().y) {
 			view.setCenter(view.getCenter().x, doodle.position().y);
 		}
-
-		
 		
 		window.clear(sf::Color().White);
 		
