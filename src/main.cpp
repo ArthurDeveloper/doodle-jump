@@ -33,6 +33,10 @@ public:
 		x = 400.f / 2; y = 533.f / 2;
 	}
 
+	inline bool is_falling() {
+		return y_speed > 0;
+	}
+
 	inline sf::Vector2f position() {
 		return {x, y};
 	}
@@ -106,7 +110,7 @@ public:
 
 	inline bool handle_collision(Doodle& doodle) {
 		if (s.getGlobalBounds().intersects(doodle.bounds())) {
-			if (y > doodle.position().y + doodle.bounds().height / 2) {
+			if (y > doodle.position().y + doodle.bounds().height / 2 && doodle.is_falling()) {
 				doodle.jump();
 				return true;
 			}
