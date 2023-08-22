@@ -151,7 +151,7 @@ int main() {
 	sf::RenderWindow window(sf::VideoMode(400.f, 533.f), "Doodle jump", sf::Style::Titlebar);
 	window.setFramerateLimit(60);
 
-	sf::View view(sf::FloatRect(0.0f, 0.0f, 400.f, 533.f));
+	sf::View view(sf::FloatRect(0.0f, 0.0f, window.getSize().x, window.getSize().y));
 	window.setView(view);
 
 	Doodle doodle;
@@ -185,7 +185,7 @@ int main() {
 	auto reset_game = [&]() {
 		doodle.reset();
 		platforms.clear();
-		view.setCenter((float)window.getSize().x / 2, (float)window.getSize().y / 2);
+		view.reset(sf::FloatRect(0.0f, 0.0f, window.getSize().x, window.getSize().y));
 		game_over = false;
 	};
 
